@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>24p Beta Key Gen</title>
+		<title>24p Key Generator</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<link href="https://chadsoft.co.uk/css/ctmkf.css" rel="Stylesheet" type="text/css">
 		<script type="text/javascript" src="sha1.js"></script>
@@ -51,18 +51,26 @@ function on_input(ele, e) {
 			else if (i == 3 || i == 11)
 				node.appendChild(document.createTextNode(' '));
 		}
+
+		node = document.getElementById("number");
+		node.innerHTML = "(" + code.toString() + ")";
 	}
 }
 		</script>
 	</head>
 	<body>
-		<div style="margin:auto; text-align:center; font-size: 1.5em">
-			<h1>24 Player Beta Code Generator</h1>
+		<div style="margin:auto; text-align:center; font-size: 1.5em; font-family: sans-serif;">
+			<h1>24 Player Key Generator For CTGP-R</h1>
 		</div>
 		<div style="margin:auto; text-align:center; font-size: 1.2em;">
 			<input id="mac-address" oninput="on_input(this, event)" type="text" placeholder="01-23-45-67-89-ab"/>
-			<h2>Beta Code:</h2>
+			<div style="font-family: sans-serif;"><h2>Activation Key:</h2></div>
 			<div style="font-family: CTMKF; font-size: x-large;" id="arrows"><em>Enter a valid MAC address...</em><br/><br/></div>
+			<div id="number"><br></div>
+		</div>
+		<div style="margin:auto; text-align:center; font-size: 0.5em; font-family: sans-serif; color: #909090;">
+			<h1><br><br>CTGP Revolution and 24 Player Mode are Copyright © ChadSoft.<br>
+			All rights reserved.</h1>
 		</div>
 	</body>
 </html>
