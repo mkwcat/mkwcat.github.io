@@ -1,76 +1,78 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>24p Key Generator</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<link href="https://chadsoft.co.uk/css/ctmkf.css" rel="Stylesheet" type="text/css">
-		<script type="text/javascript" src="sha1.js"></script>
-		<script type="text/javascript">
-function on_input(ele, e) {
-	var mac_str = ele.value.trim();
-	if (mac_str.match(/^[a-fA-F0-9]{2}-[a-fA-F0-9]{2}-[a-fA-F0-9]{2}-[a-fA-F0-9]{2}-[a-fA-F0-9]{2}-[a-fA-F0-9]{2}$/)) {
-		var salt = new Uint8Array([0x19, 0xA5, 0x7F, 0x15]);
-		var salt2 = new Uint8Array([0x03, 0x8F, 0xA5, 0x67]);
 
-		function parseHex(v) {
-			return parseInt(v, 16);
+<head>
+	<title>24p Key Generator</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="https://chadsoft.co.uk/css/ctmkf.css" rel="Stylesheet" type="text/css">
+	<script type="text/javascript" src="/s/sha1.js"></script>
+	<script type="text/javascript">
+		function on_input(ele, e) {
+			var mac_str = ele.value.trim();
+			if (mac_str.match(/^[a-fA-F0-9]{2}-[a-fA-F0-9]{2}-[a-fA-F0-9]{2}-[a-fA-F0-9]{2}-[a-fA-F0-9]{2}-[a-fA-F0-9]{2}$/)) {
+				var salt = new Uint8Array([0x19, 0xA5, 0x7F, 0x15]);
+				var salt2 = new Uint8Array([0x03, 0x8F, 0xA5, 0x67]);
+
+				function parseHex(v) {
+					return parseInt(v, 16);
+				}
+
+				var mac = new Uint8Array(mac_str.split('-').map(parseHex));
+
+				// This is normally calculated on runtime using
+				// XOR on 16-bits of the first hash with the equivalent bits
+				// of the entered beta code.
+				// This should always be zero.
+				var diff_salt = new Uint8Array([0x00, 0x00]);
+
+				var hash = sha1.create();
+				hash.update(mac);
+				hash.update(salt);
+				var array = hash.digest();
+
+				var hash2 = sha1.create();
+				hash2.update(mac);
+				hash2.update(salt2);
+				hash2.update(diff_salt);
+				var array2 = hash2.digest();
+
+				var code = array[0] << 24 | array[1] << 16 | array2[0] << 8 | array2[1];
+
+				// left, right, up, down
+				var arrows = ['', '', '', ''];
+
+				var node = document.getElementById("arrows");
+				node.innerHTML = "";
+
+				for (var i = 0; i < 16; i++) {
+					var bits = (code >> (30 - 2 * i)) & 3;
+					node.appendChild(document.createTextNode(arrows[bits]));
+					if (i == 7)
+						node.appendChild(document.createElement("br"));
+					else if (i == 3 || i == 11)
+						node.appendChild(document.createTextNode(' '));
+				}
+
+				node = document.getElementById("number");
+				node.innerHTML = "(" + code.toString() + ")";
+			}
 		}
+	</script>
+</head>
 
-		var mac = new Uint8Array(mac_str.split('-').map(parseHex));
-
-		// This is normally calculated on runtime using
-		// XOR on 16-bits of the first hash with the equivalent bits
-		// of the entered beta code.
-		// This should always be zero.
-		var diff_salt = new Uint8Array([0x00, 0x00]);
-
-		var hash = sha1.create();
-		hash.update(mac);
-		hash.update(salt);
-		var array = hash.digest();
-		
-		var hash2 = sha1.create();
-		hash2.update(mac);
-		hash2.update(salt2);
-		hash2.update(diff_salt);
-		var array2 = hash2.digest();
-
-		var code = array[0] << 24 | array[1] << 16 | array2[0] << 8 | array2[1];
-
-		// left, right, up, down
-		var arrows = ['', '', '', ''];
-
-		var node = document.getElementById("arrows");
-		node.innerHTML = "";
-
-		for (var i = 0; i < 16; i++) {
-			var bits = (code >> (30 - 2 * i)) & 3;
-			node.appendChild(document.createTextNode(arrows[bits]));
-			if (i == 7)
-				node.appendChild(document.createElement("br"));
-			else if (i == 3 || i == 11)
-				node.appendChild(document.createTextNode(' '));
-		}
-
-		node = document.getElementById("number");
-		node.innerHTML = "(" + code.toString() + ")";
-	}
-}
-		</script>
-	</head>
-	<body>
-		<div style="margin:auto; text-align:center; font-size: 1.5em; font-family: sans-serif;">
-			<h1>24 Player Key Generator For CTGP-R</h1>
+<body>
+	<div style="margin:auto; text-align:center; font-size: 1.5em; font-family: sans-serif;">
+		<h1>24 Player Key Generator For CTGP-R</h1>
+	</div>
+	<div style="margin:auto; text-align:center; font-size: 1.2em;">
+		<input id="mac-address" oninput="on_input(this, event)" type="text" placeholder="01-23-45-67-89-ab" />
+		<div style="font-family: sans-serif;">
+			<h2>Beta Code/Activation Key:</h2>
 		</div>
-		<div style="margin:auto; text-align:center; font-size: 1.2em;">
-			<input id="mac-address" oninput="on_input(this, event)" type="text" placeholder="01-23-45-67-89-ab"/>
-			<div style="font-family: sans-serif;"><h2>Activation Key:</h2></div>
-			<div style="font-family: CTMKF; font-size: x-large;" id="arrows"><em>Enter a valid MAC address...</em><br/><br/></div>
-			<div id="number"><br></div>
-		</div>
-		<div style="margin:auto; text-align:center; font-size: 0.5em; font-family: sans-serif; color: #909090;">
-			<h1><br><br>CTGP Revolution and 24 Player Mode are Copyright © ChadSoft.<br>
-			All rights reserved.</h1>
-		</div>
-	</body>
+		<div style="font-family: CTMKF; font-size: x-large;" id="arrows"><em>Enter a valid MAC
+				address...</em><br /><br /></div>
+		<div id="number"><br></div>
+	</div>
+</body>
+
 </html>
